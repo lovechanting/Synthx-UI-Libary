@@ -59,7 +59,7 @@ function UI:ToggleUI()
     self.Title.Visible = self.Visible
     for _, tab in ipairs(self.Tabs) do
         for _, button in ipairs(tab.Buttons) do
-            button.Object.Visible = self.Visible
+            button.Object.Visible = (self.Visible and tab == self.Tabs[self.ActiveTab])
         end
     end
     local targetTransparency = self.Visible and 0.9 or 0
@@ -91,11 +91,11 @@ function Library:NewToggle(name, tabID, callback)
     if not tab then return end
     local Button = Drawing.new("Text")
     Button.Text = name
-    Button.Position = UI.MainFrame.Position + Vector2.new(10, 40 + #tab.Buttons * 20)
+    Button.Position = UI.MainFrame.Position + Vector2.new(10, 40 + #tab.Buttons * 25)
     Button.Size = 18
     Button.Color = Color3.fromRGB(255, 255, 255)
     Button.Outline = true
-    Button.Visible = UI.Visible
+    Button.Visible = (UI.Visible and tab == UI.Tabs[UI.ActiveTab])
     tab.Buttons[#tab.Buttons + 1] = {Object = Button, Callback = callback}
 end
 
@@ -105,8 +105,10 @@ UserInputService.InputBegan:Connect(function(input, gpe)
             UI:ToggleUI()
         elseif input.KeyCode == Enum.KeyCode.I then
             UI.ActiveTab = math.max(1, UI.ActiveTab - 1)
+            UI:ToggleUI()
         elseif input.KeyCode == Enum.KeyCode.O then
             UI.ActiveTab = math.min(#UI.Tabs, UI.ActiveTab + 1)
+            UI:ToggleUI()
         elseif input.KeyCode == Enum.KeyCode.Return then
             local tab = UI.Tabs[UI.ActiveTab]
             if tab then
@@ -139,6 +141,12 @@ RunService.RenderStepped:Connect(function()
         local mousePos = UserInputService:GetMouseLocation()
         UI.MainFrame.Position = mousePos - UI.DragOffset
         UI:UpdateTitlePosition()
+    end
+    for _, tab in ipairs(UI.Tabs) do
+        for i, button in ipairs(tab.Buttons) do
+            button.Object.Position = UI.MainFrame.Position + Vector2.new(10, 40 + (i - 1) * 25)
+            button.Object.Visible = (UI.Visible and tab == UI.Tabs[UI.ActiveTab])
+        end
     end
 end)
 
