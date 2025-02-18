@@ -19,7 +19,8 @@ local UI = {
         ["CenterRight"] = Vector2.new(workspace.CurrentCamera.ViewportSize.X - 220, workspace.CurrentCamera.ViewportSize.Y / 2 - 100),
     },
     CurrentPosition = "Center",
-    TitlePosition = "TopLeft"
+    TitlePosition = "TopLeft",
+    OutlineColor = Color3.fromRGB(255, 255, 255)
 }
 
 function UI:CreateMainFrame()
@@ -92,7 +93,7 @@ function Library:NewToggle(name, tabID, callback)
     local tab = UI.Tabs[tabID]
     if not tab then return end
     local Button = Drawing.new("Text")
-    Button.Text = name
+    Button.Text = "[ ] " .. name
     Button.Position = UI.MainFrame.Position + Vector2.new(10, 40 + #tab.Buttons * 25)
     Button.Size = 18
     Button.Color = Color3.fromRGB(255, 255, 255)
@@ -124,6 +125,7 @@ UserInputService.InputBegan:Connect(function(input, gpe)
             if tab and tab.Buttons[UI.ActiveToggle] then
                 tab.Buttons[UI.ActiveToggle].Callback()
                 tab.Buttons[UI.ActiveToggle].Active = not tab.Buttons[UI.ActiveToggle].Active
+                tab.Buttons[UI.ActiveToggle].Object.Text = (tab.Buttons[UI.ActiveToggle].Active and "[✔] " or "[ ] ") .. tab.Buttons[UI.ActiveToggle].Object.Text:sub(5)
             end
         end
     end
@@ -136,12 +138,15 @@ RunService.RenderStepped:Connect(function()
             button.Object.Visible = (UI.Visible and tabIndex == UI.ActiveTab)
             
             if i == UI.ActiveToggle then
+                button.Object.Text = "> " .. button.Object.Text:sub(3)
                 button.Object.Color = Color3.fromRGB(0, 255, 0)
             else
+                button.Object.Text = "  " .. button.Object.Text:sub(3)
                 button.Object.Color = button.Active and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(255, 255, 255)
             end
         end
     end
+    UI.MainFrame.Color = UI.OutlineColor
 end)
 
 UI:CreateMainFrame()
