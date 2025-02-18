@@ -20,24 +20,24 @@ local UI = {
     },
     CurrentPosition = "Center",
     TitlePosition = "TopLeft",
-    OutlineColor = Color3.fromRGB(0, 255, 0)
+    OutlineColor = Color3.fromRGB(50, 50, 50)
 }
 
 function UI:CreateMainFrame()
     local Frame = Drawing.new("Square")
-    Frame.Size = Vector2.new(220, 320)
+    Frame.Size = Vector2.new(250, 350)
     Frame.Position = self.PositionPresets[self.CurrentPosition]
-    Frame.Color = Color3.fromRGB(15, 15, 15)
+    Frame.Color = Color3.fromRGB(20, 20, 20)
     Frame.Filled = true
-    Frame.Transparency = 0.9
+    Frame.Transparency = 0.95
     Frame.Visible = false
-    Frame.Thickness = 2
+    Frame.Thickness = 3
     self.MainFrame = Frame
     
     local Title = Drawing.new("Text")
     Title.Text = "Library - [None]"
     Title.Size = 20
-    Title.Color = Color3.fromRGB(200, 200, 200)
+    Title.Color = Color3.fromRGB(220, 220, 220)
     Title.Outline = true
     Title.Visible = false
     self.Title = Title
@@ -58,9 +58,9 @@ function UI:UpdateTitlePosition()
     if self.TitlePosition == "TopLeft" then
         self.Title.Position = FramePos + Vector2.new(10, 10)
     elseif self.TitlePosition == "TopCenter" then
-        self.Title.Position = FramePos + Vector2.new(100 - self.Title.TextBounds.X / 2, 10)
+        self.Title.Position = FramePos + Vector2.new(125 - self.Title.TextBounds.X / 2, 10)
     elseif self.TitlePosition == "TopRight" then
-        self.Title.Position = FramePos + Vector2.new(190 - self.Title.TextBounds.X, 10)
+        self.Title.Position = FramePos + Vector2.new(240 - self.Title.TextBounds.X, 10)
     end
 end
 
@@ -94,9 +94,9 @@ function Library:NewToggle(name, tabID, callback)
     if not tab then return end
     local Button = Drawing.new("Text")
     Button.Text = "[OFF] " .. name
-    Button.Position = UI.MainFrame.Position + Vector2.new(10, 40 + #tab.Buttons * 25)
+    Button.Position = UI.MainFrame.Position + Vector2.new(15, 50 + #tab.Buttons * 30)
     Button.Size = 18
-    Button.Color = Color3.fromRGB(200, 200, 200)
+    Button.Color = Color3.fromRGB(220, 220, 220)
     Button.Outline = true
     Button.Visible = false
     tab.Buttons[#tab.Buttons + 1] = {Object = Button, Callback = callback, Active = false}
@@ -134,15 +134,15 @@ end)
 RunService.RenderStepped:Connect(function()
     for tabIndex, tab in ipairs(UI.Tabs) do
         for i, button in ipairs(tab.Buttons) do
-            button.Object.Position = UI.MainFrame.Position + Vector2.new(10, 40 + (i - 1) * 25)
+            button.Object.Position = UI.MainFrame.Position + Vector2.new(15, 50 + (i - 1) * 30)
             button.Object.Visible = (UI.Visible and tabIndex == UI.ActiveTab)
             
             if i == UI.ActiveToggle then
                 button.Object.Text = "> " .. button.Object.Text:sub(3)
-                button.Object.Color = Color3.fromRGB(0, 255, 0)
+                button.Object.Color = Color3.fromRGB(0, 200, 255)
             else
                 button.Object.Text = "  " .. button.Object.Text:sub(3)
-                button.Object.Color = button.Active and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(200, 200, 200)
+                button.Object.Color = button.Active and Color3.fromRGB(0, 150, 255) or Color3.fromRGB(220, 220, 220)
             end
         end
     end
