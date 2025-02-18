@@ -59,7 +59,12 @@ function UI:ToggleUI()
     self.Title.Visible = self.Visible
     for _, tab in ipairs(self.Tabs) do
         for _, button in ipairs(tab.Buttons) do
-            button.Object.Visible = (self.Visible and tab == self.Tabs[self.ActiveTab])
+            button.Object.Visible = false
+        end
+    end
+    if self.Visible and self.Tabs[self.ActiveTab] then
+        for _, button in ipairs(self.Tabs[self.ActiveTab].Buttons) do
+            button.Object.Visible = true
         end
     end
     local targetTransparency = self.Visible and 0.9 or 0
@@ -95,7 +100,7 @@ function Library:NewToggle(name, tabID, callback)
     Button.Size = 18
     Button.Color = Color3.fromRGB(255, 255, 255)
     Button.Outline = true
-    Button.Visible = (UI.Visible and tab == UI.Tabs[UI.ActiveTab])
+    Button.Visible = false
     tab.Buttons[#tab.Buttons + 1] = {Object = Button, Callback = callback}
 end
 
