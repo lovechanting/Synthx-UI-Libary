@@ -6,6 +6,7 @@ local UI = {
     MainFrame = nil,
     Tabs = {},
     ActiveTab = 1,
+    ActiveToggle = 1,
     Visible = false,
     Dragging = false,
     DragOffset = Vector2.new(),
@@ -33,12 +34,21 @@ function UI:CreateMainFrame()
     self.MainFrame = Frame
     
     local Title = Drawing.new("Text")
-    Title.Text = "Library"
+    Title.Text = "Library - [None]"
     Title.Size = 20
     Title.Color = Color3.fromRGB(255, 255, 255)
     Title.Outline = true
     Title.Visible = false
     self.Title = Title
+    self:UpdateTitlePosition()
+end
+
+function UI:UpdateTitle()
+    if self.Tabs[self.ActiveTab] then
+        self.Title.Text = "Library - [" .. self.Tabs[self.ActiveTab].Name .. "]"
+    else
+        self.Title.Text = "Library - [None]"
+    end
     self:UpdateTitlePosition()
 end
 
@@ -71,19 +81,10 @@ function UI:ToggleUI()
     end
 end
 
-function UI:SetTitle(name)
-    self.Title.Text = name
-    self:UpdateTitlePosition()
-end
-
-function UI:SetTitlePosition(position)
-    self.TitlePosition = position
-    self:UpdateTitlePosition()
-end
-
 function Library:NewTab(name)
     local tab = {Name = name, Buttons = {}}
     table.insert(UI.Tabs, tab)
+    UI:UpdateTitle()
     return #UI.Tabs
 end
 
@@ -97,57 +98,48 @@ function Library:NewToggle(name, tabID, callback)
     Button.Color = Color3.fromRGB(255, 255, 255)
     Button.Outline = true
     Button.Visible = false
-    tab.Buttons[#tab.Buttons + 1] = {Object = Button, Callback = callback}
+    tab.Buttons[#tab.Buttons + 1] = {Object = Button, Callback = callback, Active = false}
 end
 
 UserInputService.InputBegan:Connect(function(input, gpe)
     if not gpe then
         if input.KeyCode == Enum.KeyCode.RightShift then
             UI:ToggleUI()
-        elseif input.KeyCode == Enum.KeyCode.I then
-            UI.ActiveTab = math.max(1, UI.ActiveTab - 1)
-            UI:ToggleUI()
         elseif input.KeyCode == Enum.KeyCode.O then
             UI.ActiveTab = math.min(#UI.Tabs, UI.ActiveTab + 1)
-            UI:ToggleUI()
+            UI.ActiveToggle = 1
+            UI:UpdateTitle()
+        elseif input.KeyCode == Enum.KeyCode.P then
+            UI.ActiveTab = math.max(1, UI.ActiveTab - 1)
+            UI.ActiveToggle = 1
+            UI:UpdateTitle()
+        elseif input.KeyCode == Enum.KeyCode.I then
+            UI.ActiveToggle = math.max(1, UI.ActiveToggle - 1)
+        elseif input.KeyCode == Enum.KeyCode.K then
+            if UI.Tabs[UI.ActiveTab] then
+                UI.ActiveToggle = math.min(#UI.Tabs[UI.ActiveTab].Buttons, UI.ActiveToggle + 1)
+            end
         elseif input.KeyCode == Enum.KeyCode.Return then
             local tab = UI.Tabs[UI.ActiveTab]
-            if tab then
-                for _, button in ipairs(tab.Buttons) do
-                    button.Callback()
-                end
+            if tab and tab.Buttons[UI.ActiveToggle] then
+                tab.Buttons[UI.ActiveToggle].Callback()
+                tab.Buttons[UI.ActiveToggle].Active = not tab.Buttons[UI.ActiveToggle].Active
             end
         end
     end
 end)
 
-UserInputService.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        local mousePos = UserInputService:GetMouseLocation()
-        if mousePos.X >= UI.MainFrame.Position.X and mousePos.X <= UI.MainFrame.Position.X + 200 and mousePos.Y >= UI.MainFrame.Position.Y and mousePos.Y <= UI.MainFrame.Position.Y + 30 then
-            UI.Dragging = true
-            UI.DragOffset = mousePos - UI.MainFrame.Position
-        end
-    end
-end)
-
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        UI.Dragging = false
-    end
-end)
-
 RunService.RenderStepped:Connect(function()
-    if UI.Dragging then
-        local mousePos = UserInputService:GetMouseLocation()
-        UI.MainFrame.Position = mousePos - UI.DragOffset
-        UI:UpdateTitlePosition()
-    end
-    
-    for _, tab in ipairs(UI.Tabs) do
+    for tabIndex, tab in ipairs(UI.Tabs) do
         for i, button in ipairs(tab.Buttons) do
             button.Object.Position = UI.MainFrame.Position + Vector2.new(10, 40 + (i - 1) * 25)
-            button.Object.Visible = (UI.Visible and tab == UI.Tabs[UI.ActiveTab])
+            button.Object.Visible = (UI.Visible and tabIndex == UI.ActiveTab)
+            
+            if i == UI.ActiveToggle then
+                button.Object.Color = Color3.fromRGB(0, 255, 0)
+            else
+                button.Object.Color = button.Active and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(255, 255, 255)
+            end
         end
     end
 end)
