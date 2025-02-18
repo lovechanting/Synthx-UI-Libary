@@ -7,6 +7,8 @@ local UI = {
     Tabs = {},
     ActiveTab = 1,
     Visible = false,
+    Dragging = false,
+    DragOffset = Vector2.new(),
     PositionPresets = {
         ["TopLeft"] = Vector2.new(20, 20),
         ["TopCenter"] = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2 - 100, 20),
@@ -16,6 +18,7 @@ local UI = {
         ["CenterRight"] = Vector2.new(workspace.CurrentCamera.ViewportSize.X - 220, workspace.CurrentCamera.ViewportSize.Y / 2 - 100),
     },
     CurrentPosition = "Center",
+    TitlePosition = "TopLeft"
 }
 
 function UI:CreateMainFrame()
@@ -31,12 +34,23 @@ function UI:CreateMainFrame()
     
     local Title = Drawing.new("Text")
     Title.Text = "Library"
-    Title.Position = Frame.Position + Vector2.new(10, 10)
     Title.Size = 20
     Title.Color = Color3.fromRGB(255, 255, 255)
     Title.Outline = true
     Title.Visible = false
     self.Title = Title
+    self:UpdateTitlePosition()
+end
+
+function UI:UpdateTitlePosition()
+    local FramePos = self.MainFrame.Position
+    if self.TitlePosition == "TopLeft" then
+        self.Title.Position = FramePos + Vector2.new(10, 10)
+    elseif self.TitlePosition == "TopCenter" then
+        self.Title.Position = FramePos + Vector2.new(100 - self.Title.TextBounds.X / 2, 10)
+    elseif self.TitlePosition == "TopRight" then
+        self.Title.Position = FramePos + Vector2.new(190 - self.Title.TextBounds.X, 10)
+    end
 end
 
 function UI:ToggleUI()
@@ -49,6 +63,16 @@ function UI:ToggleUI()
         self.Title.Transparency = i
         task.wait(0.01)
     end
+end
+
+function UI:SetTitle(name)
+    self.Title.Text = name
+    self:UpdateTitlePosition()
+end
+
+function UI:SetTitlePosition(position)
+    self.TitlePosition = position
+    self:UpdateTitlePosition()
 end
 
 function Library:NewTab(name)
@@ -84,6 +108,30 @@ UserInputService.InputBegan:Connect(function(input, gpe)
                 tab.Buttons[1].Callback()
             end
         end
+    end
+end)
+
+UserInputService.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        local mousePos = UserInputService:GetMouseLocation()
+        if mousePos.X >= UI.MainFrame.Position.X and mousePos.X <= UI.MainFrame.Position.X + 200 and mousePos.Y >= UI.MainFrame.Position.Y and mousePos.Y <= UI.MainFrame.Position.Y + 30 then
+            UI.Dragging = true
+            UI.DragOffset = mousePos - UI.MainFrame.Position
+        end
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        UI.Dragging = false
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if UI.Dragging then
+        local mousePos = UserInputService:GetMouseLocation()
+        UI.MainFrame.Position = mousePos - UI.DragOffset
+        UI:UpdateTitlePosition()
     end
 end)
 
