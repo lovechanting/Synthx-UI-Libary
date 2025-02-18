@@ -57,6 +57,11 @@ function UI:ToggleUI()
     self.Visible = not self.Visible
     self.MainFrame.Visible = self.Visible
     self.Title.Visible = self.Visible
+    for _, tab in ipairs(self.Tabs) do
+        for _, button in ipairs(tab.Buttons) do
+            button.Object.Visible = self.Visible
+        end
+    end
     local targetTransparency = self.Visible and 0.9 or 0
     for i = self.MainFrame.Transparency, targetTransparency, self.Visible and 0.1 or -0.1 do
         self.MainFrame.Transparency = i
@@ -104,8 +109,10 @@ UserInputService.InputBegan:Connect(function(input, gpe)
             UI.ActiveTab = math.min(#UI.Tabs, UI.ActiveTab + 1)
         elseif input.KeyCode == Enum.KeyCode.Return then
             local tab = UI.Tabs[UI.ActiveTab]
-            if tab and tab.Buttons[1] then
-                tab.Buttons[1].Callback()
+            if tab then
+                for _, button in ipairs(tab.Buttons) do
+                    button.Callback()
+                end
             end
         end
     end
