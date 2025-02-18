@@ -20,16 +20,16 @@ local UI = {
     },
     CurrentPosition = "Center",
     TitlePosition = "TopLeft",
-    OutlineColor = Color3.fromRGB(0, 255, 0) -- RGB Outline
+    OutlineColor = Color3.fromRGB(0, 255, 0)
 }
 
 function UI:CreateMainFrame()
     local Frame = Drawing.new("Square")
     Frame.Size = Vector2.new(220, 320)
     Frame.Position = self.PositionPresets[self.CurrentPosition]
-    Frame.Color = Color3.fromRGB(20, 20, 20)
+    Frame.Color = Color3.fromRGB(15, 15, 15)
     Frame.Filled = true
-    Frame.Transparency = 0.85
+    Frame.Transparency = 0.9
     Frame.Visible = false
     Frame.Thickness = 2
     self.MainFrame = Frame
@@ -37,7 +37,7 @@ function UI:CreateMainFrame()
     local Title = Drawing.new("Text")
     Title.Text = "Library - [None]"
     Title.Size = 20
-    Title.Color = Color3.fromRGB(255, 255, 255)
+    Title.Color = Color3.fromRGB(200, 200, 200)
     Title.Outline = true
     Title.Visible = false
     self.Title = Title
@@ -96,7 +96,7 @@ function Library:NewToggle(name, tabID, callback)
     Button.Text = "[OFF] " .. name
     Button.Position = UI.MainFrame.Position + Vector2.new(10, 40 + #tab.Buttons * 25)
     Button.Size = 18
-    Button.Color = Color3.fromRGB(255, 255, 255)
+    Button.Color = Color3.fromRGB(200, 200, 200)
     Button.Outline = true
     Button.Visible = false
     tab.Buttons[#tab.Buttons + 1] = {Object = Button, Callback = callback, Active = false}
@@ -142,7 +142,7 @@ RunService.RenderStepped:Connect(function()
                 button.Object.Color = Color3.fromRGB(0, 255, 0)
             else
                 button.Object.Text = "  " .. button.Object.Text:sub(3)
-                button.Object.Color = button.Active and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(255, 255, 255)
+                button.Object.Color = button.Active and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(200, 200, 200)
             end
         end
     end
