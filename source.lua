@@ -20,16 +20,16 @@ local UI = {
     },
     CurrentPosition = "Center",
     TitlePosition = "TopLeft",
-    OutlineColor = Color3.fromRGB(255, 255, 255)
+    OutlineColor = Color3.fromRGB(0, 255, 0) -- RGB Outline
 }
 
 function UI:CreateMainFrame()
     local Frame = Drawing.new("Square")
-    Frame.Size = Vector2.new(200, 300)
+    Frame.Size = Vector2.new(220, 320)
     Frame.Position = self.PositionPresets[self.CurrentPosition]
-    Frame.Color = Color3.fromRGB(30, 30, 30)
+    Frame.Color = Color3.fromRGB(20, 20, 20)
     Frame.Filled = true
-    Frame.Transparency = 0.9
+    Frame.Transparency = 0.85
     Frame.Visible = false
     Frame.Thickness = 2
     self.MainFrame = Frame
@@ -93,7 +93,7 @@ function Library:NewToggle(name, tabID, callback)
     local tab = UI.Tabs[tabID]
     if not tab then return end
     local Button = Drawing.new("Text")
-    Button.Text = "[ ] " .. name
+    Button.Text = "[OFF] " .. name
     Button.Position = UI.MainFrame.Position + Vector2.new(10, 40 + #tab.Buttons * 25)
     Button.Size = 18
     Button.Color = Color3.fromRGB(255, 255, 255)
@@ -125,7 +125,7 @@ UserInputService.InputBegan:Connect(function(input, gpe)
             if tab and tab.Buttons[UI.ActiveToggle] then
                 tab.Buttons[UI.ActiveToggle].Callback()
                 tab.Buttons[UI.ActiveToggle].Active = not tab.Buttons[UI.ActiveToggle].Active
-                tab.Buttons[UI.ActiveToggle].Object.Text = (tab.Buttons[UI.ActiveToggle].Active and "[✔] " or "[ ] ") .. tab.Buttons[UI.ActiveToggle].Object.Text:sub(5)
+                tab.Buttons[UI.ActiveToggle].Object.Text = (tab.Buttons[UI.ActiveToggle].Active and "[ON] " or "[OFF] ") .. tab.Buttons[UI.ActiveToggle].Object.Text:sub(6)
             end
         end
     end
