@@ -57,21 +57,17 @@ function UI:ToggleUI()
     self.Visible = not self.Visible
     self.MainFrame.Visible = self.Visible
     self.Title.Visible = self.Visible
+    
     for _, tab in ipairs(self.Tabs) do
         for _, button in ipairs(tab.Buttons) do
             button.Object.Visible = false
         end
     end
+    
     if self.Visible and self.Tabs[self.ActiveTab] then
         for _, button in ipairs(self.Tabs[self.ActiveTab].Buttons) do
             button.Object.Visible = true
         end
-    end
-    local targetTransparency = self.Visible and 0.9 or 0
-    for i = self.MainFrame.Transparency, targetTransparency, self.Visible and 0.1 or -0.1 do
-        self.MainFrame.Transparency = i
-        self.Title.Transparency = i
-        task.wait(0.01)
     end
 end
 
@@ -147,6 +143,7 @@ RunService.RenderStepped:Connect(function()
         UI.MainFrame.Position = mousePos - UI.DragOffset
         UI:UpdateTitlePosition()
     end
+    
     for _, tab in ipairs(UI.Tabs) do
         for i, button in ipairs(tab.Buttons) do
             button.Object.Position = UI.MainFrame.Position + Vector2.new(10, 40 + (i - 1) * 25)
